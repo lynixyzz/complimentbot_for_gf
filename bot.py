@@ -10,7 +10,7 @@ import json
 
 '''
 bot = telebot.TeleBot(os.getenv('BOT_TOKEN'))
-ALLOWED_IDS = []
+ALLOWED_IDS = list(map(int, os.getenv("ALLOWED_USERS", "").split(",")))
 
 compliments = []
 motivation = []
