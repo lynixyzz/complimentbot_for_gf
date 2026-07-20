@@ -6,7 +6,6 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
-STATE_FILE = BASE_DIR / "state.json"
 
 
 def _load_dotenv() -> None:
@@ -35,8 +34,17 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 ALLOWED_IDS = parse_ids(os.getenv("ALLOWED_USERS"))
 ADMIN_IDS = parse_ids(os.getenv("ADMIN_IDS"))
 WEATHERAPI_KEY = os.getenv("WEATHERAPI_KEY")
+
+# Порт: Railway передаёт PORT, локально — WEBAPP_PORT (по умолчанию 8080).
+WEBAPP_PORT = int(os.getenv("PORT") or os.getenv("WEBAPP_PORT", "8080"))
+
+# Публичный адрес веб-аппа: задаётся вручную либо берётся из домена Railway.
 WEBAPP_URL = os.getenv("WEBAPP_URL")
-WEBAPP_PORT = int(os.getenv("WEBAPP_PORT", "8080"))
+if not WEBAPP_URL and os.getenv("RAILWAY_PUBLIC_DOMAIN"):
+    WEBAPP_URL = f"https://{os.getenv('RAILWAY_PUBLIC_DOMAIN')}"
+
+# Файл состояния: на Railway диск эфемерный — задай STATE_FILE на путь тома, чтобы не терять гео/фразу.
+STATE_FILE = Path(os.getenv("STATE_FILE") or (BASE_DIR / "state.json"))
 
 _lock = threading.Lock()
 

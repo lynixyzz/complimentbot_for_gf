@@ -52,6 +52,21 @@ python bot.py
 `WEBAPP_URL` должен указывать на публичный https (продакшн-хостинг или туннель
 вроде `cloudflared`/`ngrok`, проксирующий на `WEBAPP_PORT`).
 
+## Деплой на Railway
+
+Всё в одном сервисе: polling + сервер веб-аппа слушает `$PORT` (Railway задаёт его сам).
+
+1. **New Project → Deploy from GitHub repo**, выбрать этот репозиторий.
+2. **Variables** — добавить `BOT_TOKEN`, `ALLOWED_USERS`, `ADMIN_IDS`, `WEATHERAPI_KEY`.
+   `PORT`, `WEBAPP_URL`, `WEBAPP_PORT` задавать **не нужно**.
+3. **Settings → Networking → Generate Domain**. Появится `RAILWAY_PUBLIC_DOMAIN`,
+   из него автоматически соберётся `WEBAPP_URL` (`https://<домен>`) — кнопка «Фраза дня» заработает.
+4. Старт-команда берётся из `Procfile` (`web: python bot.py`), версия Python — из `.python-version`.
+
+Диск на Railway эфемерный: при редеплое `state.json` (гео коти, фраза дня) сбросится.
+Чтобы сохранять — подключи **Volume** (например на `/data`) и задай переменную
+`STATE_FILE=/data/state.json`.
+
 ## Тесты
 
 ```bash
