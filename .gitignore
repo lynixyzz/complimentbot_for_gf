@@ -147,6 +147,9 @@ activemq-data/
 # SageMath parsed files
 *.sage.py
 
+# Runtime state (гео, сид фразы, дата предупреждения о погоде)
+state.json
+
 # Environments
 .env
 .envrc
