@@ -19,6 +19,7 @@ def test_parse_ids():
 
 
 def test_categorize():
+<<<<<<< HEAD
     # тексты условий weatherapi.com
     assert categorize("Patchy rain possible") == "rain"
     assert categorize("Moderate rain") == "rain"
@@ -30,6 +31,16 @@ def test_categorize():
     assert categorize("Ice pellets") == "snow"
     assert categorize("Sunny") is None
     assert categorize("Partly cloudy") is None
+=======
+    assert categorize("rain") == "rain"
+    assert categorize("heavy-rain") == "rain"
+    assert categorize("showers") == "rain"
+    assert categorize("thunderstorm-with-rain") == "thunderstorm"
+    assert categorize("hail") == "thunderstorm"
+    assert categorize("wet-snow") == "snow"
+    assert categorize("clear") is None
+    assert categorize("partly-cloudy") is None
+>>>>>>> 618f9d3d46489185dc6902e13cafdb0bbecc7857
     assert categorize(None) is None
 
 
