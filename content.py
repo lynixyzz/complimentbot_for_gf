@@ -66,7 +66,7 @@ def reply_for(category: str) -> str:
 
 def weather_quote(category: str) -> str:
     quotes = WEATHER_QUOTES.get(category) or WEATHER_QUOTES.get("default") or []
-    return random.choice(quotes) if quotes else "котя, завтра погода шалит — береги себя ❤️"
+    return random.choice(quotes) if quotes else "полгода плохая погода..."
 
 
 def phrase_of_day(on: date | None = None, seed: int | None = None) -> str:
