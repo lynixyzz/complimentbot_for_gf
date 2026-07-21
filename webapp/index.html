@@ -107,6 +107,7 @@
     position: relative;
     width: min(64vw, 268px); aspect-ratio: 1;
     cursor: pointer;
+    perspective: 900px;
     animation: enter-sphere 1.2s var(--ease-expo) both .1s;
     transition: transform .9s var(--ease-expo);
   }
@@ -120,7 +121,7 @@
   body.revealed .stage,
   body.revealed .stage:active { transform: scale(.6) translate3d(0,-8px,0); }
 
-  /* Гало: статичное размытие, вращается только transform-слой */
+  /* Гало: мягкое статичное свечение, дышит только transform-слой */
   .halo-wrap {
     position: absolute; inset: -16%;
     animation: breathe 5s ease-in-out infinite;
@@ -128,58 +129,77 @@
   }
   .halo {
     position: absolute; inset: 0; border-radius: 50%;
-    background: conic-gradient(from 40deg,
-      var(--violet), var(--magenta), var(--wine), var(--navy), var(--teal), var(--violet));
-    filter: blur(28px) saturate(1.25);
-    opacity: .5;
-    animation: rotate 16s linear infinite reverse;
-    will-change: transform;
+    background:
+      radial-gradient(50% 50% at 34% 30%, rgba(124,58,237,.55), transparent 70%),
+      radial-gradient(46% 46% at 70% 70%, rgba(219,39,119,.38), transparent 70%),
+      radial-gradient(40% 40% at 60% 30%, rgba(14,116,144,.28), transparent 70%);
+    filter: blur(26px);
+    opacity: .55;
   }
   @keyframes breathe {
     0%, 100% { transform: scale(1); }
     50%      { transform: scale(1.06); }
   }
 
-  /* Сфера: плазма вращается ПОД неподвижным светом */
+  /* 3D-сцена: орбита реально уходит ЗА сферу */
+  .scene {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  /* Хрустальный шар: стеклянное тело, туманность внутри, неподвижный свет */
   .sphere {
     position: absolute; inset: 0;
     border-radius: 50%;
     overflow: hidden;
-    transform: translateZ(0);
+    transform: translateZ(1px);
+    background: radial-gradient(75% 75% at 50% 42%, #2b2470 0%, #1c1250 46%, #0e0930 100%);
     box-shadow:
-      inset -28px -34px 70px rgba(5,3,14,.85),
-      inset 18px 22px 55px rgba(196,181,253,.25),
-      0 26px 90px rgba(76,29,149,.5);
+      inset 0 -20px 44px rgba(124,58,237,.3),
+      inset -26px -32px 64px rgba(5,3,14,.72),
+      inset 16px 20px 52px rgba(196,181,253,.16),
+      0 26px 90px rgba(76,29,149,.45),
+      0 0 0 1px rgba(196,181,253,.14);
   }
-  .plasma {
-    position: absolute; inset: -12%;
-    border-radius: 50%;
-    background: conic-gradient(from 210deg,
-      var(--violet-deep), var(--violet), var(--magenta), var(--wine),
-      var(--navy), var(--teal), var(--violet-deep));
-    animation: rotate 11s linear infinite;
+  /* Туманность внутри стекла: два слоя блобов во встречном вращении */
+  .glow, .glow2 {
+    position: absolute; inset: -25%;
     will-change: transform;
   }
+  .glow {
+    background:
+      radial-gradient(38% 38% at 30% 35%, rgba(124,58,237,.7), transparent 70%),
+      radial-gradient(34% 34% at 72% 60%, rgba(219,39,119,.5), transparent 70%),
+      radial-gradient(30% 30% at 45% 78%, rgba(14,116,144,.45), transparent 70%);
+    animation: rotate 26s linear infinite;
+  }
+  .glow2 {
+    background:
+      radial-gradient(30% 30% at 62% 30%, rgba(157,23,77,.4), transparent 70%),
+      radial-gradient(26% 26% at 34% 66%, rgba(30,58,138,.5), transparent 70%);
+    animation: rotate 34s linear infinite reverse;
+  }
   @keyframes rotate { to { transform: rotate(360deg); } }
-  /* Неподвижный источник света + ядро */
+  /* Стекло: острый блик + мягкий свет + каустика у нижней кромки */
   .sphere::before {
     content: ""; position: absolute; inset: 0; border-radius: 50%;
     background:
-      radial-gradient(55% 42% at 32% 25%, rgba(255,255,255,.55), transparent 60%),
-      radial-gradient(70% 70% at 50% 55%, transparent 40%, rgba(5,3,14,.5) 100%);
+      radial-gradient(20% 13% at 33% 21%, rgba(255,255,255,.85), transparent 70%),
+      radial-gradient(50% 34% at 38% 26%, rgba(255,255,255,.24), transparent 70%),
+      radial-gradient(46% 24% at 50% 89%, rgba(196,181,253,.32), transparent 72%);
     z-index: 2;
   }
   .sphere::after {
     content: ""; position: absolute; inset: -1px; border-radius: 50%;
-    background: radial-gradient(closest-side, transparent 80%, rgba(221,214,254,.28) 97%, transparent 100%);
+    background: radial-gradient(closest-side, transparent 82%, rgba(221,214,254,.3) 96%, transparent 100%);
     z-index: 3;
   }
 
-  /* Орбита: два спутника */
+  /* Орбита: спутники проходят перед сферой и за ней (z-сортировка preserve-3d) */
   .orbit {
-    position: absolute; inset: -13%;
+    position: absolute; inset: -18%;
     border-radius: 50%;
-    border: 1px solid rgba(165,180,252,.22);
+    border: 1px solid rgba(165,180,252,.2);
     transform: rotateX(72deg);
     transform-style: preserve-3d;
     animation: orbit-spin 13s linear infinite;
@@ -199,14 +219,14 @@
   .ripple {
     position: absolute; inset: 0; border-radius: 50%;
     border: 1.5px solid rgba(224,231,255,.6);
-    opacity: 0; transform: scale(1);
+    opacity: 0; transform: translateZ(2px) scale(1);
     pointer-events: none;
   }
   .ripple.go   { animation: ripple-out 1s var(--ease-expo) forwards; }
   .ripple.go2  { animation: ripple-out 1.15s var(--ease-expo) .12s forwards; }
   @keyframes ripple-out {
-    from { opacity: .75; transform: scale(1); }
-    to   { opacity: 0;  transform: scale(1.6); }
+    from { opacity: .75; transform: translateZ(2px) scale(1); }
+    to   { opacity: 0;  transform: translateZ(2px) scale(1.6); }
   }
 
   /* ===== Фраза ===== */
@@ -257,7 +277,7 @@
   /* ===== Доступность ===== */
   .stage:focus-visible { outline: 2px solid var(--label); outline-offset: 8px; border-radius: 50%; }
   @media (prefers-reduced-motion: reduce) {
-    .nebula, .stars, .halo, .halo-wrap, .plasma, .orbit, .hint, .stage, .eyebrow { animation: none !important; }
+    .nebula, .stars, .halo-wrap, .glow, .glow2, .orbit, .hint, .stage, .eyebrow { animation: none !important; }
     .stage, .phrase .w, .tomorrow { transition-duration: .01s !important; transition-delay: 0s !important; }
     .eyebrow, .hint { opacity: 1; }
   }
@@ -276,8 +296,10 @@
 
     <div class="stage" id="stage" role="button" tabindex="0" aria-label="Открыть фразу дня">
       <div class="halo-wrap"><div class="halo"></div></div>
-      <div class="sphere"><div class="plasma"></div></div>
-      <div class="orbit"><i></i><i></i></div>
+      <div class="scene">
+        <div class="sphere"><div class="glow"></div><div class="glow2"></div></div>
+        <div class="orbit"><i></i><i></i></div>
+      </div>
       <div class="ripple" id="r1"></div>
       <div class="ripple" id="r2"></div>
     </div>
